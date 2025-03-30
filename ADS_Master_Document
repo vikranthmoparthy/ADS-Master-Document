@@ -1,0 +1,1310 @@
+"""
+File Name: ADS_Master_Document.py
+Details: Contains all assignment and tutorial code, as well as data structure code and additional functionality
+"""
+
+"""
+General Data Structures
+"""
+
+"""
+Stacks
+"""
+
+class Stack:
+    """
+    Creates a stack that allows for last-in-first-out (LIFO) access
+    """
+
+    def __init__(self):
+        self._stack = []
+
+    def push(self, item) -> None:
+        """
+        Adds an item to the top of the stack
+        :param item: item to add
+        """
+        self._stack.append(item)
+
+    def pop(self):
+        """
+        Removes and returns the item on top of the stack
+        :return: item on top of the stack
+        """
+        return self._stack.pop()
+
+    def size(self) -> int:
+        """
+        Returns the number of items on the stack
+        :return: number of items on the stack
+        """
+        return len(self._stack)
+    
+    def to_list(self):
+        """
+        Returns a list of all items in the stack from bottom to top.
+        :return: list of items in LIFO order (bottom to top)
+        """
+        return self._stack[:]
+    
+"""
+Queues
+"""
+
+class Queue:
+    """
+    Creates a first-in-first-out (FIFO) queue
+    """
+
+    def __init__(self):
+        self._q = [0, 0]
+        self._front = 0
+        self._back = 0
+
+    def size(self) -> int:
+        """
+        Returns the number of items in the queue
+        :return: number of items in the queue
+        """
+        size = self._back - self._front
+        if self._front > self._back:
+            size += len(self._q)
+        return size
+
+    def dequeue(self):
+        """
+        Removed and returns the oldest item in the queue
+        :return: the item that has been in the queue the longest
+        """
+        if self.size() == 0:
+            print("Queue empty!")
+            return None
+        item = self._q[self._front]
+        self._front = (self._front + 1) % len(self._q)
+        return item
+
+    def enqueue(self, item) -> None:
+        """
+        Adds an item to the end of the queue
+        :param item: item to add to the queue
+        """
+        self._q[self._back] = item
+        self._back = (self._back + 1) % len(self._q)
+        if self._back == self._front:
+            self._back += len(self._q)
+            self._q.extend(self._q)
+    
+    def to_list(self):
+        """
+        Returns a list of all items in the queue in order.
+        :return: list of items in FIFO order
+        """
+        if self.size() == 0:
+            return []
+        
+        if self._front < self._back:
+            return self._q[self._front:self._back]
+        else:
+            return self._q[self._front:] + self._q[:self._back]
+
+"""
+LinkedList
+"""
+
+class LinkedList:
+    """
+    Creates a linked list data structure
+    """
+    def __init__(self, item = None, next = None):
+        self._item = item
+        self._next = next
+
+    def _list_empty_error(self) -> None:
+        print("List empty")
+
+
+    def get_first_item(self):
+        """
+        Returns the first value stored in the linked list
+        :return: the first value stored in the linked list
+        """
+        if self._next is None:
+            self._list_empty_error()
+            return None
+        return self._next._item
+
+    def remove_first_item(self):
+        """
+        Returns and removes the first value stored in the linked list
+        :return: the first value stored in the linked list
+        """
+        if self._next is None:
+            self._list_empty_error()
+            return None
+        item = self._next._item
+        self._next = self._next._next
+        return item
+
+    def size(self) -> int:
+        """
+        Returns the number of items stored in the linked list
+        :return: the number of items stored in the linked list
+        """
+        size = 0
+        node = self._next
+        while node is not None:
+            size += 1
+            node = node._next
+        return size
+
+    def visit(self, action) -> None:
+        """
+        Performs an action for every item stored on the list
+        :param action: function that takes the value of a node as input
+        """
+        if self._next is not None:
+            action(self._next._item)
+            self._next.visit(action)
+
+    def _invalid_position(self) -> None:
+        print("Invalid position")
+
+    def _list_too_short_error(self) -> None:
+        print("Linked list is too short")
+
+    def get_item(self, pos: int):
+        """
+        Returns the item at the given position in the linked list
+        :param pos: position of the item to return
+        :return: the item at the given position in the linked list
+        """
+        if pos < 0:
+            self._invalid_position()
+            return None
+        if self._next is None:
+            self._list_too_short_error()
+            return None
+        if pos == 0:
+            return self._next._item
+        return self._next.get_item(pos - 1)
+
+    def add(self, item, pos: int = 0) -> None:
+        """
+        Adds an item to the linked list
+        :param item: item to add
+        :param pos: position to add the item (by default at the start of the linked list)
+        """
+        if pos < 0:
+            self._invalid_position()
+        elif pos == 0:
+            self._next = LinkedList(item, self._next)
+        elif self._next is not None:
+            self._next.add(item, pos - 1)
+        else:
+            self._list_too_short_error()
+
+    def _value_not_found_error(self):
+        print("Value not found")
+
+    def remove(self, value) -> None:
+        """
+        Removes the first occurrence of a given value
+        :param value: value to remove
+        """
+        if self._next is not None:
+            if self._next._item == value:
+                self.remove_first_item()
+            else:
+                self._next.remove(value)
+        else:
+            self._value_not_found_error()
+
+    def remove_iterative(self, value) -> None:
+        node = self
+        while node._next is not None and node._next._item != value:
+            node = node._next
+        if node._next is not None:
+            node._next = node._next._next
+        else:
+            self._value_not_found_error()
+
+"""
+Trees
+"""
+
+class TreeNode:
+
+    def __init__(self, item=None, left=None, right=None):
+        self._item = item
+        self._height = 0
+        self._left = left
+        self._right = right
+
+    def _update_height(self) -> None:
+        self._height = 0
+        if self._left is not None:
+            self._height = max(self._height, self._left._height + 1)
+        if self._right is not None:
+            self._height = max(self._height, self._right._height + 1)
+
+    
+    def _get_height_imbalance(self) -> int:
+        imbalance = 0
+        if self._left is not None:
+            imbalance -= self._left._height
+        if self._right is not None:
+            imbalance += self._right._height
+        return imbalance
+
+    #Traversals
+    def preorder(self, action):
+        action(self._item)
+        if self._left is not None:
+            self._left.preorder(action)
+        if self._right is not None:
+            self._right.preorder(action)
+
+    def postorder(self, action):
+        if self._left is not None:
+            self._left.postorder(action)
+        if self._right is not None:
+            self._right.postorder(action)
+        action(self._item)
+
+    def inorder(self, action):
+        if self._left is not None:
+            self._left.inorder(action)
+        action(self._item)
+        if self._right is not None:
+            self._right.inorder(action)
+
+#Search for a value in tree       
+def search_in_search_tree(tree: TreeNode, value):
+    if tree is None:
+        return tree
+    if value == tree._item:
+        return tree
+    if value < tree._item:
+        return search_in_search_tree(tree._left, value)
+    return search_in_search_tree(tree._right, value)
+
+#Add to a search tree
+def add_in_search_tree(tree: TreeNode, value) -> TreeNode:
+    if tree is None:
+        return TreeNode(value)
+    if value < tree._item:
+        tree._left = add_in_search_tree(tree._left, value)
+        tree._update_height()
+    elif value > tree._item:
+        tree._right = add_in_search_tree(tree._right, value)
+        tree._update_height()
+    return tree
+
+def _rotate_clockwise(tree: TreeNode) -> TreeNode:
+    new_root = tree._left
+    tree._left = new_root._right
+    new_root._right = tree
+    tree._update_height()
+    new_root._update_height()
+    return new_root
+
+def _rotate_anticlockwise(tree: TreeNode) -> TreeNode:
+    new_root = tree._right
+    tree._right = new_root._left
+    new_root._left = tree
+    tree._update_height()
+    new_root._update_height()
+    return new_root
+
+def _rebalance_tree(tree: TreeNode) -> TreeNode:
+    imbalance = tree._get_height_imbalance()
+    if imbalance <= -2:
+        if tree._left._get_height_imbalance() <= 0:
+            return _rotate_clockwise(tree)
+        else:
+            tree._left = _rotate_anticlockwise(tree._left)
+            return _rotate_clockwise(tree)
+    elif imbalance >= 2:
+        if tree._right._get_height_imbalance() >= 0:
+            return _rotate_anticlockwise(tree)
+        else:
+            tree._right = _rotate_clockwise(tree._right)
+            return _rotate_anticlockwise(tree)
+    return tree
+
+
+"""
+Heaps
+"""
+
+class Heap:
+    def __init__(self):
+        self._heap = [0]
+
+    def size(self) -> int:
+        return len(self._heap) - 1
+
+    def _heap_empty_error(self) -> None:
+        print("Heap empty")
+
+    def _upheap(self, index: int) -> None:
+        if index == 1:  
+            return
+        parent_index = index // 2  # Parent node index
+        if self._heap[parent_index] < self._heap[index]:  # Max heap condition
+            self._heap[index], self._heap[parent_index] = self._heap[parent_index], self._heap[index]
+            self._upheap(parent_index)
+
+    def enqueue(self, value) -> None:
+        self._heap.append(value)
+        self._upheap(len(self._heap) - 1)
+
+    def _downheap(self, index: int) -> None:
+        left = 2 * index
+        right = (2 * index) + 1
+        v = self._heap[index]
+
+        if left < len(self._heap):
+            lc = self._heap[left]
+        else:
+            lc = None
+
+        if right < len(self._heap):
+            rc = self._heap[right]
+        else:
+            rc = None
+
+        if lc is not None or rc is not None:
+            if lc is not None and rc is not None:
+                if lc >= rc and lc > v:
+                    self._heap[left], self._heap[index] = self._heap[index], self._heap[left]
+                    self._downheap(left)
+                elif rc > v:
+                    self._heap[right], self._heap[index] = self._heap[index], self._heap[right]
+                    self._downheap(right)
+
+            elif lc is not None and lc > v:
+                self._heap[left], self._heap[index] = self._heap[index], self._heap[left]
+                self._downheap(left)
+
+            elif rc is not None and rc > v:
+                self._heap[right], self._heap[index] = self._heap[index], self._heap[right]
+                self._downheap(right)
+
+    def remove_max(self):
+        if self.size() == 0:
+            self._heap_empty_error()
+            return None
+        if self.size() == 1:
+            return self._heap.pop()
+        
+        return_value = self._heap[1]
+        self._heap[1] = self._heap.pop()
+        self._downheap(1)
+        return return_value
+
+    def remove_min(self):
+        if self.size() == 0:
+            self._heap_empty_error()
+            return None
+        if self.size() == 1:
+            return self._heap.pop()
+
+        min_index = 1  # Start from the first element (root)
+        for i in range(2, len(self._heap)):  # Find the minimum in the heap
+            if self._heap[i] < self._heap[min_index]:
+                min_index = i
+
+        return_value = self._heap[min_index]
+        self._heap[min_index] = self._heap.pop()  # Replace with the last element
+
+        if min_index < len(self._heap):  
+            self._downheap(min_index)  # Restore heap property if needed
+
+        return return_value
+    
+
+"""
+GraphEdge
+"""
+
+class GraphEdge:
+    def __init__(self, origin, destination, weight: float = 1.0):
+        self._origin = origin
+        self._destination = destination
+        self._weight = weight
+
+    def is_incident(self, node: int) -> bool:
+        return node == self._origin or node == self._destination
+
+    def other_node(self, node: int) -> int:
+        if self.is_incident(node):
+            return self._origin + self._destination - node
+        return -1
+
+    def get_weight(self) -> float:
+        return self._weight
+    
+"""
+UndirectedGraph - List Representation
+"""
+
+class UndirectedGraph:
+    def __init__(self, node_count: int):
+        self._neighbours = [[] for _ in range(node_count)]
+
+    def add_edge(self, node1: int, node2: int, weight: int = 1):
+        new_edge = GraphEdge(node1, node2, weight)
+        self._neighbours[node1].append(new_edge)
+        self._neighbours[node2].append(new_edge)
+
+"""
+UndirectedGraph - Matrix Representation
+"""
+
+class UndirectedGraph:
+    def __init__(self, node_count: int):
+        self._edges = [[None] * node_count for _ in range(node_count)]
+
+    def add_edge(self, node1: int, node2: int, weight: int = 1):
+        self._edges[node1][node2] = weight
+        self._edges[node2][node1] = weight
+
+#Depth-first search
+def depth_first_search(self, start_node: int, action, visited: list[bool] = None) -> list[bool]:
+    if visited is None:
+        visited = [False] * len(self._neighbours)
+    action(start_node)
+    visited[start_node] = True
+    for edge in self._neighbours[start_node]:
+        other_node = edge.other_node(start_node)
+        if not visited[other_node]:
+            self.depth_first_search(other_node, action, visited)
+    return visited
+
+#Breadth-first search
+def breadth_first_search(self, start_node, action) -> list[bool]:
+    visited = [False] * len(self._neighbours)
+    q = Queue()
+    visited[start_node] = True
+    q.enqueue(start_node)
+    while q.size() > 0:
+        current_node = q.dequeue()
+        action(current_node)
+        for edge in self._neighbours[current_node]:
+            other_node = edge.other_node(current_node)
+            if not visited[other_node]:
+                visited[other_node] = True
+                q.enqueue(other_node)
+    return visited
+
+"""
+Lab Assignment Code
+"""
+
+"""
+lab1planes
+"""
+
+import sys
+#from queue import Queue
+#from stack import Stack
+
+RUNWAY_LENGTH = 7
+HANGAR_SIZE = 5
+lines = sys.stdin.read().splitlines()
+lines.pop() 
+exit = Queue()
+waiting_runway = Queue() #Waiting_runway is a queue because it is FIFO (first-in-first-out)
+hangar = Stack() #Hangar is a stack because it is LIFO (last-in-first-out)
+
+for line in lines:
+    airplane, condition = line.strip().split("\t")
+    if condition == "yes":
+        hangar.push(airplane)
+        #If the hangar is now full, clear runway and add all planes in hangar to the runway
+        if hangar.size() == 5:
+            while waiting_runway.size() != 0:
+                exit.enqueue(waiting_runway.dequeue())
+            while hangar.size() != 0:
+                waiting_runway.enqueue(hangar.pop())
+    elif condition == "no":
+        waiting_runway.enqueue(airplane)
+        #If the waiting is now full, clear it.
+        if waiting_runway.size() == 7:
+            while waiting_runway.size() != 0:
+                exit.enqueue(waiting_runway.dequeue())
+
+#After processing all planes, we now send planes to exit. First we send the planes from the runway, then from the hangar (because of the diagram).
+while waiting_runway.size() != 0:
+    exit.enqueue(waiting_runway.dequeue())
+while hangar.size() != 0:
+    exit.enqueue(hangar.pop())
+
+#Print the order in which the planes exit.
+while exit.size() != 0:
+    print(exit.dequeue())
+
+
+"""
+lab2equations
+"""
+
+"""
+Scanner
+"""
+
+from enum import Enum
+
+class TokenType(Enum):
+    """
+    Tokens can be of three types:
+    numbers (digits), identifiers (characters), and symbols (any)
+    """
+    NUMBER = 1
+    IDENTIFIER = 2
+    SYMBOL = 3
+
+
+class TokenList:
+    def __init__(self):
+        self._type = TokenType.NUMBER
+        self._value = None
+        self._next = None
+
+    def __str__(self): 
+        return_value = "NUMBER" if self._type == TokenType.NUMBER else \
+                        "IDENTIFIER" if self._type == TokenType.IDENTIFIER else \
+                        "SYMBOl"
+        if self._next is not None:
+            return_value += " " + str(self._next)
+        return return_value
+
+
+def _match_number(text: str, position: int) -> tuple[int, int]:
+    """
+    Reads a number from the input
+    :param text: input string
+    :param position: start position of the number
+    :return: (number read, first position in text after the read number)
+    """
+    output = 0
+    while position < len(text) and "0" <= text[position] <= "9":
+        output = output*10 + int(text[position])
+        position += 1
+    return output, position
+
+
+def _match_symbol(text: str, position: int) -> tuple[str, int]:
+    """
+    Reads a single character as a symbol from the input
+    :param text: input string
+    :param position: start position of the symbol
+    :return: (symbol read, first position in text after the read symbol)
+    """
+    return text[position], position + 1
+
+
+def _match_identifier(text: str, position: int) -> tuple[str, int]:
+    """
+    Reads an identifier  from the input
+    :param text: input string
+    :param position: start position of the identifier
+    :return: (identifier read, first position in text after the read identifier)
+    """
+    old_position = position
+    while position < len(text) and text[position].isalnum():
+        position += 1
+    return text[old_position:position], position
+
+
+def _generate_node(text: str, position: int) -> tuple[TokenList, int]:
+    """
+    Generates a new TokenList node.
+    :param text: string to read the node information from
+    :param position: start position of the information
+    :return: a tuple with the generated node and the new position in the input
+    """
+    new_node = TokenList()
+    if "0" <= text[position] <= "9":
+        # A digit signals the start of a number
+        new_node._type = TokenType.NUMBER
+        new_node._value, position = _match_number(text, position)
+    elif text[position].isalpha():
+        # An alphabetic character signals an identifier
+        new_node._type = TokenType.IDENTIFIER
+        new_node._value, position = _match_identifier(text, position)
+    else:
+        # In all other cases, it is a symbol
+        new_node._type = TokenType.SYMBOL
+        new_node._value, position = _match_symbol(text, position)
+    return new_node, position
+
+
+def generate_token_list(text: str) -> TokenList:
+    head = None
+    tail = None
+    position = 0
+    while position < len(text):
+        if text[position].isspace():
+            position += 1
+        else:
+            node, position = _generate_node(text, position)
+            if head is None:
+                head = node
+            else:
+                tail._next = node
+            tail = node
+    return head
+
+
+"""
+Lab Code
+"""
+
+#from scanner import *
+
+class TokenListPosition:
+    def __init__(self, tokens: TokenList):
+        self.tokens = tokens
+
+def accept_number(position: TokenListPosition) -> bool:
+    if position.tokens is not None:
+        if position.tokens._type == TokenType.NUMBER:
+            position.tokens = position.tokens._next
+            return True
+    return False
+
+def accept_identifier(position: TokenListPosition) -> bool:
+    if position.tokens is not None:
+        if position.tokens._type == TokenType.IDENTIFIER:
+            position.tokens = position.tokens._next
+            return True
+    return False
+
+def accept_symbol(position: TokenListPosition, symbol: str) -> bool:
+    if position.tokens is not None:
+        if position.tokens._type == TokenType.SYMBOL:
+            if position.tokens._value == symbol:
+                position.tokens = position.tokens._next
+                return True
+    return False
+
+def accept_factor(position: TokenListPosition) -> bool:
+    return (
+        accept_number(position) or
+        accept_identifier(position) or
+        (accept_symbol(position, "(") and 
+        accept_expression(position) and 
+        accept_symbol(position, ")")))
+
+def accept_term(pos: TokenListPosition) -> bool:
+    encountered_number = accept_number(pos)
+
+    encountered_identifier = accept_identifier(pos)
+
+    if not (encountered_number or encountered_identifier):
+        return False
+    elif encountered_number and not encountered_identifier:
+        return True
+    
+    encountered_carrot = accept_symbol(pos, "^")
+    if encountered_carrot:
+        if not accept_number(pos):
+            return False
+    return True
+
+def accept_expression(pos: TokenListPosition) -> bool:
+    # Optional '-' at the beginning
+    if accept_symbol(pos, "-"):
+        pass
+
+    # Must have at least one term
+    if not accept_term(pos):
+        return False
+
+    # Zero or more occurrences of '+' or '-' followed by a term
+    while accept_symbol(pos, "+") or accept_symbol(pos, "-"):
+        if not accept_term(pos):
+            return False
+
+    return True
+
+
+def recognize_equation(tokenlist: TokenList) -> bool:
+    """
+    Determines whether a token list represents a valid equation.
+    
+    :param tokenlist: input token list
+    :return: True if the token list represents a valid equation, otherwise False.
+    """
+    pos = TokenListPosition(tokenlist)
+    
+    # Check for the first expression
+    if not accept_expression(pos):
+        return False
+    
+    # Check for the '=' symbol
+    if not accept_symbol(pos, "="):
+        return False
+    
+    # Check for the second expression after the '=' symbol
+    if not accept_expression(pos):
+        return False
+    
+    if not pos.tokens is None:
+        return False
+    
+    return True
+
+
+def get_degree(tokenlist: TokenList) -> int:
+    """
+    Determines the highest exponent in a token list.
+    For linear terms, the exponentiation symbol is optional, and the exponent is considered 1.
+
+    :param tokenlist: input token list
+    :return: the highest exponent in the token list, or 0 if no exponent is found
+    """
+    current_token = tokenlist
+    max_exponent = 0  # Default to 0 if no exponent is found
+
+    while current_token is not None:
+        if current_token._type == TokenType.SYMBOL and current_token._value == "^":
+            # Check if the next token is a number (exponent)
+            next_token = current_token._next
+            if next_token is not None and next_token._type == TokenType.NUMBER:
+                max_exponent = max(max_exponent, int(next_token._value))
+        elif current_token._type == TokenType.IDENTIFIER:
+            # For identifiers (e.g., x), assume an exponent of 1 if no ^ is found
+            if current_token._next is None or current_token._next._type != TokenType.SYMBOL or current_token._next._value != "^":
+                max_exponent = max(max_exponent, 1)
+        current_token = current_token._next
+
+    return max_exponent
+
+
+def is_single_variable_equation(tokenlist: TokenList) -> bool:
+    """
+    Determines whether a token list contains exactly one distinct identifier.
+
+    :param tokenlist: input token list
+    :return: True iff the token list contains exactly one distinct identifier.
+    """
+    current_token = tokenlist
+    identifiers = set()  # Set to store distinct identifiers
+
+    while current_token is not None:
+        if current_token._type == TokenType.IDENTIFIER:
+            identifiers.add(current_token._value)
+        current_token = current_token._next
+
+    return len(identifiers) == 1
+
+"""
+lab3spellchecker: efficient solution
+"""
+
+class TrieNode:
+    def __init__(self): #Using definition given in question
+        self._children: dict[str, TrieNode] = {} 
+        self.is_end_of_word = False #Keeping track of end of trie branch
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def add(self, word):
+        current_node = self.root
+        for char in word:
+            if char not in current_node._children: #Checking if character already exists as a node
+                current_node._children[char] = TrieNode() #If not, create
+            current_node = current_node._children[char]
+        current_node.is_end_of_word = True
+    
+    def search_in_trie(self, p): #Using the pseudocode from Prof. de Weerd's slides 
+        t = self.root
+        for x in p:
+            if x not in t._children:
+                return False
+            t = t._children[x]
+        return t.is_end_of_word
+
+def main():
+    trie = Trie() #Initiaize trie
+    allowed_words = [] #Accumulate dictionary of words
+    
+    # Read allowed words
+    while True:
+        try:
+            dict_word = input().strip().lower() #Case-insensitive and striping of whitespace
+        except EOFError:
+            break
+        if dict_word == "!":
+            break
+        allowed_words.append(dict_word)
+
+    for term in allowed_words: #Add each term to the trie
+        trie.add(term)
+
+    total_words = []
+    separators = set("0123456789.,'/-\":;?!() ") #More efficient than list (which was used earlier)
+
+    # Read text lines
+    while True:
+        try:
+            line = input().strip().lower()
+        except EOFError: #Handling issue with Themis
+            break
+        if not line:
+            break
+        
+        word = "" #Extract the words from each line
+        for letter in line:
+            if letter not in separators: #Skip the separators
+                word += letter
+            else:
+                if word:  #Avoid empty strings
+                    total_words.append(word)  
+                word = ""
+        
+        if word:  
+            total_words.append(word)  #Append last word if it exists
+
+    unknown_words = []
+    for word in total_words:
+        if not trie.search_in_trie(word):  # If the word is not in the trie (hence unknown)
+            unknown_words.append(word)  # Add it to the list of unknown words
+
+    for word in unknown_words:
+        print(word) #Output all unknwon words
+    print(f"There are {len(unknown_words)} unknown words.")
+
+if __name__ == "__main__": #For testing of Trie()
+    main()
+
+"""
+lab5trainsinthestorm
+"""
+
+"""
+File:   trainsinthestorms.py
+Authors: Vikranth Moparthy (v.moparthy@student.rug.nl), Prof. Harmen de Weerd (harmen.de.weerd@rug.nl)
+
+Description:
+    A program that finds the fastest train connections between a pair of cities in the Netherlands given a network of connections of many cities and travel times between them. 
+    Also factors in possible disruptions.
+"""
+#from ADS import GraphEdge, UndirectedGraph, Heap
+
+def dijkstra(G: UndirectedGraph, start: int) -> tuple[dict, dict]:
+    distances = {node: float('inf') for node in range(len(G._neighbours))}  #Initally all distances to all nodes are infinity 
+    predecessors = {node: None for node in range(len(G._neighbours))} #Keeping track of path
+    distances[start] = 0 #Node distance to itself is 0
+
+    heap = Heap() #Implementing heap for inverted priority queue
+    heap.enqueue((0, start))
+
+    while heap.size > 0: 
+        current_dist, u = heap.remove_min() #Node with minimal distance from 
+        
+        # Skip processed nodes with outdated distances
+        if current_dist > distances[u]:
+            continue
+            
+        # Explore neighbors
+        for edge in G._neighbours[u]:
+            v = edge.other_node(u)
+            weight = edge.get_weight()
+                # If a shorter path to v is found
+            new_dist = distances[u] + weight
+
+            if new_dist < distances[v]:
+                distances[v] = new_dist
+                predecessors[v] = u
+                heap.enqueue((new_dist, v)) #Add v to heap for further exploration
+
+    paths = {} #Backtracking paths
+    for node in range(len(G._neighbours)):
+        if distances[node] == float('inf'): #In case a path does not exist
+            paths[node] = None
+            continue
+            
+        path = []
+        current = node
+        while current is not None:
+            path.append(current)
+            current = predecessors[current]
+        paths[node] = path[::-1]  # Reverse to get start->end order
+
+    return distances, paths
+
+def main():
+    G = UndirectedGraph(12)
+    nodes = {
+        "Den Helder": 0, "Amsterdam": 1, "Den Haag": 2, "Utrecht": 3, "Eindhoven": 4, 
+        "Maastricht": 5, "Nijmegen": 6, "Zwolle": 7, "Enschede": 8, "Meppel": 9, 
+        "Leeuwarden": 10, "Groningen": 11
+    } #Map each city to a number
+
+     #Add all the connections as given in the question
+    G.add_edge(nodes["Amsterdam"], nodes["Den Haag"], 46)
+    G.add_edge(nodes["Amsterdam"], nodes["Den Helder"], 77)
+    G.add_edge(nodes["Amsterdam"], nodes["Utrecht"], 26)
+    G.add_edge(nodes["Den Haag"], nodes["Eindhoven"], 89)
+    G.add_edge(nodes["Eindhoven"], nodes["Maastricht"], 63)
+    G.add_edge(nodes["Eindhoven"], nodes["Nijmegen"], 55)
+    G.add_edge(nodes["Eindhoven"], nodes["Utrecht"], 47)
+    G.add_edge(nodes["Enschede"], nodes["Zwolle"], 50)
+    G.add_edge(nodes["Groningen"], nodes["Leeuwarden"], 34)
+    G.add_edge(nodes["Groningen"], nodes["Meppel"], 49)
+    G.add_edge(nodes["Leeuwarden"], nodes["Meppel"], 40)
+    G.add_edge(nodes["Maastricht"], nodes["Nijmegen"], 111)
+    G.add_edge(nodes["Meppel"], nodes["Zwolle"], 15)
+    G.add_edge(nodes["Nijmegen"], nodes["Zwolle"], 77)
+    G.add_edge(nodes["Utrecht"], nodes["Zwolle"], 51)
+
+    input_lines = [] #First take all input
+    while True:
+        line = input().strip()
+        if line == "!":
+            break
+        input_lines.append(line)
+    
+    # Process disruptions
+    n = int(input_lines[0])
+    idx = 1
+    for _ in range(n):
+        city1 = input_lines[idx]
+        city2 = input_lines[idx+1]
+        G.remove_edge(nodes[city1], nodes[city2]) #Remove edges where disruptions occur, because there exists no connection between them
+        idx += 2
+    
+    # Process queries
+    while idx < len(input_lines):
+        start = input_lines[idx]
+        end = input_lines[idx+1]
+        idx += 2
+        
+        start_node = nodes.get(start)
+        end_node = nodes.get(end)
+        
+        if start_node is None or end_node is None:
+            print("UNREACHABLE") #Incomplete or erroneous input
+            continue
+        
+        distances, paths = dijkstra(G, start_node)
+        
+        if distances[end_node] == float("inf"): #Case where distance is infinity
+            print("UNREACHABLE")
+        else:
+            path = paths[end_node] #Extract the path to the required destination node
+            for node in path:
+                city = next(k for k, v in nodes.items() if v == node) #How to get key given value in dictionary. Source: https://shorturl.at/p5h1S
+                print(city)
+            print(distances[end_node])
+
+main()
+
+"""
+Tutorial Code / Additional Code
+"""
+
+#2.3: Stack from one or more queues
+
+class StackUsingQueue:
+    def __init__(self):
+        self.queue1 = Queue()
+        self.queue2 = Queue()
+
+    def push(self, item):
+        self.queue1.enqueue(item)
+
+    def pop(self):
+        if self.queue1.size() == 0:
+            print("Stack is empty!")
+            return None
+
+        # Move all elements from queue1 to queue2, except the last one
+        while self.queue1.size() > 1:
+            self.queue2.enqueue(self.queue1.dequeue())
+        
+        # The last element in queue1 is the one to pop
+        item = self.queue1.dequeue()
+
+        # Swap queues
+        self.queue1, self.queue2 = self.queue2, self.queue1
+
+        return item
+    
+#2.4: Checking if parenthetical expression in balanced
+
+def is_balanced(s):
+    stack = Stack()
+    for i in s:
+        if i == "(" or i == "[":
+            stack.push(i)
+        elif i == "]":
+            if stack.size() == 0 or stack.pop() != "[":
+                print("unbalanced")
+                return
+        elif i == ")":
+            if stack.size() == 0 or stack.pop() != "(":
+                print("unbalanced")
+                return
+    if stack.size() != 0:
+        print("unbalanced")
+    else:
+        print("balanced")
+
+#2.6: Pop method in Queue()
+
+def pop(self):
+    """
+    Retrieve and remove the value that was added last
+    :return: the item that was added last to the queue
+    """
+    if self.size() == 0:
+        print("Queue empty!")
+        return None
+    
+    val = self._q[self._back - 1]
+    self._back = (self._back - 1) % len(self._q)
+    return val
+
+#2.7: Pop in stack removes max element
+
+def pop(self):
+    """
+    Removes and returns the item on top of the stack
+    :return: item on top of the stack
+    """
+    max_ = max(self._stack)
+    self._stack.remove(max_)
+    return max_
+
+#2.8: Copy a stack
+
+def copy_stack_recursively(stack):
+    """
+    Function to copy a stack recursively.
+    """
+    # Base case: If the stack is empty, return an empty list (representing an empty stack)
+    if not stack:
+        return []
+
+    # Step 1: Pop the top element from the stack
+    top_element = stack.pop()
+
+    # Step 2: Copy the rest of the stack recursively
+    copied_stack = copy_stack_recursively(stack)
+
+    # Step 3: Push the popped element to the copied stack to maintain order
+    copied_stack.append(top_element)
+
+    # Step 4: Push the element back to the original stack to preserve its state
+    stack.append(top_element)
+
+    return copied_stack
+
+#2.11: LinkedList method to find whether a particular value exists. (Iterative solution)
+
+def find(self, value):
+    while self._next is not None and self._next._item != value:
+        self = self._next
+    if self._next is None:
+        return False
+    else:
+        return True
+
+#2.12: LinkedList method to remove all nodes from a list with a given value
+def remove_all(self, value):
+    if self._next is None:
+        return
+    if self._next._item == value:
+        self.remove_first_item()
+        self.remove_all(value)
+    else:
+        self._next.remove_all(value)
+
+#2.13: LinkedList method to remove a node at a given position from a list
+def remove_at_index(self, pos):
+    if pos > self.size():
+        return self._list_too_short_error()
+    if pos == 0:
+        self.remove_first_item()
+    if self._next is not None:
+        return self._next.remove_at_index(pos - 1)
+    
+#2.15 LinkedList method to remove last occurence of a given value
+def remove_last_occurrence(self, value) -> None:
+
+    prev_last = None  # Track predecessor of the last occurrence
+    prev = self       # Current predecessor node during traversal
+    current = self._next  # Current node being checked
+    
+    # Traverse the entire list
+    while current is not None:
+        if current._item == value:
+            prev_last = prev  # Update last found position
+        prev = current
+        current = current._next
+    
+    # Remove the node if found
+    if prev_last is not None:
+        prev_last._next = prev_last._next._next
+    else:
+        self._value_not_found_error()
+
+#2.16: LinkedList method to remove consecutive duplicate values
+def remove_duplicates(self):
+    if self._next is None:
+        return
+    if self._next._next is not None and self._next._item == self._next._next._item:
+        self._next = self._next._next  # Remove duplicate
+        self.remove_duplicates()  # Continue checking
+    else:
+        self._next.remove_duplicates()  # Move to next node
+
+
+#3.3 a) Function to copy a tree
+def copy_tree(tree: TreeNode) -> TreeNode:
+    if tree is None:
+        return None
+    return TreeNode(tree._item, copy_tree(tree._left), copy_tree(tree._right))
+
+#3.3 b) Get height of tree
+def tree_height(tree: TreeNode) -> int:
+    if tree is None:
+        return -1  # Return -1 so that a single-node tree has height 0
+    
+    left_height = tree_height(tree._left)
+    right_height = tree_height(tree._right)
+    
+    return 1 + max(left_height, right_height)
+
+
+#3.3 c) Number of nodes in tree
+def node_number(tree: TreeNode) -> int:
+    if tree is None:
+        return 0
+    return 1 + node_number(tree._left) + node_number(tree._right)
+
+#3.3 d) Find node with max value
+def find_max_node(tree: TreeNode) -> int | None:
+    if not tree:
+        return None
+    current = tree
+    while current._right is not None:
+        current = current._right
+    return current._item
+
+#3.3 e) Highest position that contains a rode
+
+def is_search_tree(root: TreeNode) -> bool:
+    def validate(node, low=-float('inf'), high=float('inf')):
+        if not node:
+            return True
+        if not (low < node._item < high):
+            return False
+        return (validate(node._left, low, node._item) and 
+                validate(node._right, node._item, high))
+    return validate(root)
+
+#3.4: Finds node with a given position, n
+
+def find_node(tree: TreeNode, pos: int) -> TreeNode:
+    if tree is None:
+        return None
+    
+    if pos == 1:
+        return tree
+    
+    parent_pos = pos // 2
+
+    if pos % 2 == 0:
+        return find_node(tree._left, parent_pos)
+    else:
+        return find_node(tree._right, parent_pos)
+    
+#3.7 Tree to list
+def tree_to_list(tree: TreeNode, index=1, result=None) -> list:
+    if result is None:
+        result = []
+    
+    # Ensure the list is large enough for the current index
+    while len(result) < index:
+        result.append(None)
+    
+    result[index - 1] = tree._item  # 1-based index adjustment
+
+    if tree._left:
+        tree_to_list(tree._left, index * 2, result)  # Left child at index * 2
+    if tree._right:
+        tree_to_list(tree._right, index * 2 + 1, result)  # Right child at index * 2 + 1
+
+    return result
+
+#3.8 a) Inorder Successor
+def inorder_successor(node: TreeNode) -> TreeNode:
+    if node._right is not None:
+        w = node._right
+        while w._left is not None:
+            w = w._left
+        return w
+    return None
+
+
+    
+def remove_from_search_tree(tree: TreeNode, value: int) -> TreeNode:
+    # Step 1: Search for the node to remove
+    node = tree
+    parent = None
+    
+    # Find the node
+    while node is not None and node._item != value:
+        parent = node
+        if value < node._item:
+            node = node._left
+        else:
+            node = node._right
+
+    if node is None:
+        return tree  # Value not found, return tree as is
+
+    # Step 2: Node found, remove the node based on number of children
+    # Case 1: Node has no children (leaf node)
+    if node._left is None and node._right is None:
+        if parent is None:
+            return None  # If root node is to be deleted, return None
+        if parent._left == node:
+            parent._left = None
+        else:
+            parent._right = None
+    
+    # Case 2: Node has one child
+    elif node._left is None or node._right is None:
+        child = node._left if node._left is not None else node._right
+        if parent is None:
+            return child  # If root node is to be deleted, return its only child
+        if parent._left == node:
+            parent._left = child
+        else:
+            parent._right = child
+    
+    # Case 3: Node has two children
+    else:
+        # Find the inorder successor
+        successor = inorder_successor(node)
+        
+        # Replace node's value with the successor's value
+        node._item = successor._item
+        
+        # Now remove the successor node
+        remove_from_search_tree(node._right, successor._item)  # Successor is always in the right subtree
+
+    return tree
+
+#3.10: Function to upheap (already there)
+
+#3.11: Function to downheap (already there)
