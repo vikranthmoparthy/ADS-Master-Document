@@ -1313,4 +1313,40 @@ def remove_from_search_tree(tree: TreeNode, value: int) -> TreeNode:
 """
 Additional Useful Functions
 """
+def dijkstra_with_paths(G: UndirectedGraph, start: int) -> tuple[dict, dict]: #Dijkstra's algorithm with shortest path
+    distances = {node: float('inf') for node in range(len(G._neighbours))}
+    predecessors = {node: None for node in range(len(G._neighbours))}
+    distances[start] = 0
 
+    heap = Heap()
+    heap.enqueue((0, start))
+
+    while heap.size > 0:
+        current_dist, u = heap.remove_min()
+
+        if current_dist > distances[u]:
+            continue
+
+        for edge in G._neighbours[u]:
+            v = edge.other_node(u)
+            weight = edge.get_weight()
+            new_dist = distances[u] + weight
+
+            if new_dist < distances[v]:
+                distances[v] = new_dist
+                predecessors[v] = u
+                heap.enqueue((new_dist, v))
+
+    paths = {}
+    for node in range(len(G._neighbours)):
+        if distances[node] == float('inf'):
+            paths[node] = None
+        else:
+            path = []
+            current = node
+            while current is not None:
+                path.append(current)
+                current = predecessors[current]
+            paths[node] = path[::-1]
+
+    return distances, paths
