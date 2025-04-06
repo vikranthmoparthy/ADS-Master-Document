@@ -1516,8 +1516,6 @@ def inorder_successor(node: TreeNode) -> TreeNode:
         return w
     return None
 
-
-    
 def remove_from_search_tree(tree: TreeNode, value: int) -> TreeNode:
     # Step 1: Search for the node to remove
     node = tree
@@ -1567,6 +1565,8 @@ def remove_from_search_tree(tree: TreeNode, value: int) -> TreeNode:
 
     return tree
 
+#Time complextity: Worst case: O(H), Balanced tree: O(log H), where H is the height of the tree
+
 #3.10: Function to upheap (already there)
 
 #3.11: Function to downheap (already there)
@@ -1612,3 +1612,55 @@ def dijkstra_with_paths(G: UndirectedGraph, start: int) -> tuple[dict, dict]: #D
             paths[node] = path[::-1]
 
     return distances, paths
+
+"""
+The graph uses an adjacency list → total neighbor checks = O(E)
+The custom heap’s remove_min() scans the whole heap → O(N) per call
+The heap can grow up to O(E) elements (one per edge)
+Up to O(E) calls to enqueue → O(E log E) total
+Up to O(E) calls to remove_min() → O(E²) total
+Reconstructing paths takes O(V²) in worst case
+Total time complexity: O(E² + V²)
+"""
+
+# Time Complexity Summary:
+
+# StackUsingQueue:
+# push: O(1) - Simple enqueue operation.
+# pop: O(n) - Transfers all elements except the last one to another queue.
+
+# is_balanced (Balanced Parentheses):
+# O(n) - Each character is processed once with stack operations.
+
+# Queue pop method:
+# pop: O(1) - Direct index manipulation.
+
+# Stack pop (removes max element):
+# pop: O(n) - Scans all elements to find and remove the maximum.
+
+# Copy stack recursively:
+# O(n^2) - Repeated stack traversal during recursion.
+
+# LinkedList methods:
+# find: O(n) - Sequential traversal to find a value.
+# remove_all: O(n) - Recursively removes all nodes with a given value.
+# remove_at_index: O(n) - Traverses nodes up to the specified index.
+# remove_last_occurrence: O(n) - Traverses all nodes to find and remove the last occurrence.
+# remove_duplicates: O(n) - Recursively checks consecutive nodes for duplicates.
+
+# Tree functions:
+# copy_tree: O(n) - Visits all nodes to copy them.
+# tree_height: O(n) - Calculates height by visiting all nodes once.
+# node_number: O(n) - Counts all nodes recursively.
+# find_max_node: O(h) - Traverses along the rightmost path (height h).
+# is_search_tree: O(n) - Validates each node recursively using range constraints.
+# find_node: O(h) - Traverses down to a specific position (height h).
+# tree_to_list: O(n) - Visits all nodes to convert them into a list representation.
+# inorder_successor: O(h) - Traverses leftmost nodes in a subtree (height h).
+# remove_from_search_tree:
+#   Worst case: O(h), where h is the height of the tree.
+#   Balanced tree: O(log n), where n is the number of nodes.
+
+# Dijkstra's Algorithm:
+# dijkstra_with_paths:
+# Total time complexity: O(E² + V²), where E is the number of edges and V is the number of vertices.
