@@ -46,7 +46,21 @@ class Stack:
         :return: list of items in LIFO order (bottom to top)
         """
         return self._stack[:]
-    
+
+# Time Complexity Analysis for Stack Class:
+
+# push(item): O(1)
+# Appends an item to the end of the list. In Python, appending to a list is an O(1) operation in the average case.
+
+# pop(): O(1)
+# Removes and returns the last item from the list. Popping from the end of a list is an O(1) operation in Python.
+
+# size(): O(1)
+# Returns the length of the list using len(). The len() function in Python is an O(1) operation as it directly accesses the stored size of the list.
+
+# to_list(): O(n)
+# Returns a shallow copy of the list using slicing. Slicing a list has a time complexity of O(n), where n is the number of elements in the list.
+
 """
 Queues
 """
@@ -106,6 +120,23 @@ class Queue:
             return self._q[self._front:self._back]
         else:
             return self._q[self._front:] + self._q[:self._back]
+
+# Time Complexity Analysis for Queue Class:
+
+# __init__(): O(1)
+# Initializes the queue with a fixed-size list and sets the front and back pointers.
+
+# size(): O(1)
+# Calculates the size of the queue using simple arithmetic operations.
+
+# dequeue(): O(1)
+# Removes and returns the front item from the queue. Uses modulo arithmetic for circular queue implementation.
+
+# enqueue(item): O(1) amortized, O(n) worst case
+# Adds an item to the end of the queue. Amortized O(1) because extending the list is infrequent, but when it does occur, it takes O(n) time, where n is the current size of the queue.
+
+# to_list(): O(n)
+# Returns a list of all items in the queue by iterating through the circular buffer.
 
 """
 LinkedList
@@ -228,6 +259,47 @@ class LinkedList:
         else:
             self._value_not_found_error()
 
+# Time Complexity Analysis for LinkedList Class:
+
+# __init__(item=None, next=None): O(1)
+# Initializes a new node with given item and next pointer.
+
+# _list_empty_error(): O(1)
+# Prints an error message.
+
+# get_first_item(): O(1)
+# Returns the first item in the list (if it exists).
+
+# remove_first_item(): O(1)
+# Removes the first item in the list (if it exists).
+
+# size(): O(n)
+# Iterates through the list to count the number of items.
+
+# visit(action): O(n)
+# Recursively applies the given action to each item in the list.
+
+# _invalid_position(): O(1)
+# Prints an error message.
+
+# _list_too_short_error(): O(1)
+# Prints an error message.
+
+# get_item(pos): O(n)
+# Recursively traverses the list to find the item at the given position.
+
+# add(item, pos=0): O(n)
+# Recursively traverses the list to add the item at the given position.
+
+# _value_not_found_error(): O(1)
+# Prints an error message.
+
+# remove(value): O(n)
+# Recursively traverses the list to remove the first occurrence of the given value.
+
+# remove_iterative(value): O(n)
+# Iteratively traverses the list to remove the first occurrence of the given value.
+
 """
 Trees
 """
@@ -277,6 +349,27 @@ class TreeNode:
         action(self._item)
         if self._right is not None:
             self._right.inorder(action)
+
+# Time Complexity Analysis for TreeNode Class:
+
+# __init__(item=None, left=None, right=None): O(1)
+# Initializes a new node with given item, height, and child pointers.
+
+# _update_height(): O(1)
+# Updates the height of the current node based on the heights of its children.
+
+# _get_height_imbalance(): O(1)
+# Calculates the height imbalance of the current node based on the heights of its children.
+
+# preorder(action): O(n)
+# Recursively applies the given action to each node in a preorder traversal.
+
+# postorder(action): O(n)
+# Recursively applies the given action to each node in a postorder traversal.
+
+# inorder(action): O(n)
+# Recursively applies the given action to each node in an inorder traversal.
+
 
 #Search for a value in tree       
 def search_in_search_tree(tree: TreeNode, value):
@@ -331,6 +424,25 @@ def _rebalance_tree(tree: TreeNode) -> TreeNode:
             tree._right = _rotate_clockwise(tree._right)
             return _rotate_anticlockwise(tree)
     return tree
+
+# Time Complexity Analysis for Search Tree Functions:
+
+# search_in_search_tree(tree, value):
+# O(h) - where h is the height of the tree. In a balanced tree, h is log(n),
+# but in the worst case (e.g., skewed tree), it can be O(n).
+
+# add_in_search_tree(tree, value):
+# O(h) - where h is the height of the tree for the same reasons as above.
+# Includes an O(1) call to _update_height().
+
+# _rotate_clockwise(tree):
+# O(1) - Simple pointer manipulations. Includes two O(1) calls to _update_height().
+
+# _rotate_anticlockwise(tree):
+# O(1) - Simple pointer manipulations. Includes two O(1) calls to _update_height().
+
+# _rebalance_tree(tree):
+# O(1) - Simple height checks and calls to rotate, which are O(1).
 
 
 """
@@ -422,7 +534,33 @@ class Heap:
             self._downheap(min_index)  # Restore heap property if needed
 
         return return_value
-    
+
+# Time Complexity Analysis for Heap Class:
+
+# __init__(): O(1)
+# Initializes the heap with an initial list containing a placeholder element.
+
+# size(): O(1)
+# Returns the number of elements in the heap (excluding the placeholder).
+
+# _heap_empty_error(): O(1)
+# Prints an error message if the heap is empty.
+
+# _upheap(index): O(log n)
+# Moves an element up the heap to maintain heap property.
+
+# enqueue(value): O(log n)
+# Adds a new element to the end of the heap and then calls _upheap to maintain heap property.
+
+# _downheap(index): O(log n)
+# Moves an element down the heap to maintain heap property.
+
+# remove_max(): O(log n)
+# Removes the maximum element from the heap (root) and then calls _downheap to maintain heap property.
+
+# remove_min(): O(n)
+# Removes the minimum element from the heap. Needs to iterate through all elements and then calls _downheap.
+
 
 """
 GraphEdge
@@ -444,7 +582,21 @@ class GraphEdge:
 
     def get_weight(self) -> float:
         return self._weight
-    
+
+# Time Complexity Analysis for GraphEdge Class:
+
+# __init__(origin, destination, weight=1.0): O(1)
+# Initializes a new edge with the given origin, destination, and weight.
+
+# is_incident(node): O(1)
+# Checks if the given node is incident to the edge.
+
+# other_node(node): O(1)
+# Returns the other node connected by the edge.
+
+# get_weight(): O(1)
+# Returns the weight of the edge.
+
 """
 UndirectedGraph - List Representation
 """
@@ -458,6 +610,15 @@ class UndirectedGraph:
         self._neighbours[node1].append(new_edge)
         self._neighbours[node2].append(new_edge)
 
+# Time Complexity Analysis for UndirectedGraph Class (List Representation):
+
+# __init__(node_count): O(n)
+# Initializes the graph with a list of empty lists (adjacency lists) for each node.
+
+# add_edge(node1, node2, weight=1): O(1)
+# Adds an edge between node1 and node2.
+
+
 """
 UndirectedGraph - Matrix Representation
 """
@@ -469,6 +630,15 @@ class UndirectedGraph:
     def add_edge(self, node1: int, node2: int, weight: int = 1):
         self._edges[node1][node2] = weight
         self._edges[node2][node1] = weight
+
+# Time Complexity Analysis for UndirectedGraph (Matrix Representation) Class:
+
+# __init__(node_count): O(n^2)
+# Initializes the graph with a matrix of size n x n (n = node_count).
+
+# add_edge(node1, node2, weight=1): O(1)
+# Adds an edge between node1 and node2 by updating two positions in the matrix.
+
 
 #Depth-first search
 def depth_first_search(self, start_node: int, action, visited: list[bool] = None) -> list[bool]:
@@ -497,6 +667,14 @@ def breadth_first_search(self, start_node, action) -> list[bool]:
                 visited[other_node] = True
                 q.enqueue(other_node)
     return visited
+
+# Time Complexity Analysis for Graph Traversal Functions:
+
+# depth_first_search(self, start_node, action, visited=None):
+# O(V + E) - where V is the number of vertices (nodes) and E is the number of edges in the graph.
+
+# breadth_first_search(self, start_node, action):
+# O(V + E) - where V is the number of vertices (nodes) and E is the number of edges in the graph.
 
 """
 Lab Assignment Code
@@ -545,6 +723,13 @@ while hangar.size() != 0:
 while exit.size() != 0:
     print(exit.dequeue())
 
+# Time Complexity Analysis for lab1planes.py:
+
+# Overall Time Complexity: O(n)
+# Explanation: The main loop iterates through each line in the input,
+# and the operations inside the loop (enqueue, push, pop, size) are O(1)
+# for the data structures used (Queue and Stack).
+# The while loops after processing the lines also have O(n) complexity in total.
 
 """
 lab2equations
@@ -656,7 +841,6 @@ def generate_token_list(text: str) -> TokenList:
                 tail._next = node
             tail = node
     return head
-
 
 """
 Lab Code
@@ -801,6 +985,24 @@ def is_single_variable_equation(tokenlist: TokenList) -> bool:
 
     return len(identifiers) == 1
 
+Time Complexity Analysis Summary:
+
+Scanner:
+    _match_number: O(k) (k = digits in number)
+    _match_symbol: O(1)
+    _match_identifier: O(k) (k = chars in identifier)
+    generate_token_list: O(n) (n = input text length)
+
+Parser:
+    accept_term, accept_number, accept_identifier, accept_symbol: O(1)
+    accept_expression: O(n) (n = tokens in expression)
+    recognize_equation: O(n) (n = tokens in equation)
+    get_degree: O(n) (n = tokens in equation)
+    is_single_variable_equation: O(n) (n = tokens in equation)
+
+Overall: O(n) where n is the length of the input string (due to parsing).
+
+
 """
 lab3spellchecker: efficient solution
 """
@@ -882,6 +1084,41 @@ def main():
 
 if __name__ == "__main__": #For testing of Trie()
     main()
+
+Time Complexity Analysis:
+
+TrieNode Class:
+    __init__: O(1) - Initializes a new Trie node with an empty dictionary.
+
+Trie Class:
+    __init__: O(1) - Initializes the Trie with a root node.
+    add(word): O(m) - where m is the length of the word.
+    search_in_trie(word): O(m) - where m is the length of the word.
+
+Main Program:
+    Reading allowed words: O(n) - where n is the number of allowed words.
+    Adding words to Trie: O(N * m) - where N is the number of allowed words,
+       and m is the average length of the allowed words.
+    Reading text lines: O(L) - where L is the total length of all input lines.
+    Extracting total words from text lines: O(L)
+    Searching for unknown words: O(T * k) - where T is the number of total words
+       and k is the average length of total words.
+    Outputting unknown words: O(U) - where U is the number of unknown words.
+
+Overall: O(N*m + L + T*k)
+    N: number of allowed words.
+    m: average length of allowed words.
+    L: total length of input lines.
+    T: number of total words in input.
+    k: average length of total words.
+
+Summary:
+    The trie operations (add and search) are O(m) where m is the
+    length of the word. The main program complexity is dominated by
+    reading the input and processing the words.  This results in a final time
+    complexity of O(N*m + L + T*k).
+
+
 """
 lab4expressiontrees
 """
@@ -1146,6 +1383,268 @@ def main(): #The input code is mostly the same as Prof. de Weerd's, however it i
 main()
 
 """
+lab4expressiontrees
+"""
+"""
+File:   expTree_test.py
+Author: Vikranth Moparthy (v.moparthy@student.rug.nl)
+Description:
+   A program that recognises and returns the value of a numerical infix expression. If the expression is non-numeric,
+it provides the simplified version of the expression and its derivative with respect to x.
+"""
+
+class Token:
+    def __init__(self, token_type: TokenType, value):
+        self.type = token_type
+        self.value = value
+
+def is_operator(char: str) -> bool:
+    return char in "+-*/"
+
+def precedence(op: str) -> int: #For building tree
+    if op in ('+', '-'):
+        return 1
+    if op in ('*', '/'): #Multiplication and division have higher priority
+        return 2
+    return 0
+
+def tokenize(text: str) -> list[Token]:
+    if text is None:
+        return None
+    tokens = []
+    pos = 0
+    while pos < len(text):
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+        if pos >= len(text):
+            break
+        if text[pos].isdigit():
+            value, pos = _match_number(text, pos)
+            tokens.append(Token(TokenType.NUMBER, value))
+        elif text[pos].isalpha():
+            identifier, pos = _match_identifier(text, pos)
+            tokens.append(Token(TokenType.IDENTIFIER, identifier))
+        else:
+            symbol, pos = _match_symbol(text, pos)
+            tokens.append(Token(TokenType.SYMBOL, symbol))
+    return tokens
+
+def build_tree(tokens: list[Token]) -> TreeNode: #Builds tree from tokens in infix order
+    values = []  # Stack for operands (list representation)
+    operators = []  # Stack for operators
+
+    def apply_operator(): #Pops operands and operator, builds subtree, pushes result. With help from: https://shorturl.at/P4f8X
+        if len(values) < 2 or not operators:
+            return
+        right = values.pop()
+        left = values.pop()
+        op = operators.pop()
+        node = TreeNode(Token(TokenType.SYMBOL, op.value))
+        node._left = left
+        node._right = right
+        values.append(node)
+
+    if not tokens or tokens[0].type == TokenType.SYMBOL and tokens[0].value not in "(":  # Reject if the expression starts with an operator
+        return None
+
+    previous_token = None
+
+    for token in tokens:
+        if token.type == TokenType.NUMBER or token.type == TokenType.IDENTIFIER:
+            if previous_token and previous_token.type in [TokenType.NUMBER, TokenType.IDENTIFIER]:  # Two consecutive operands are not allowed
+                return None  
+            values.append(TreeNode(token))
+
+        elif token.type == TokenType.SYMBOL:
+            if token.value == "(":  # If the token is an opening parenthesis
+                operators.append(token)
+            elif token.value == ")":  # If the token is a closing parenthesis
+                while operators and operators[-1].value != "(":  
+                    apply_operator()
+                if not operators:
+                    return None  # Unbalanced parentheses
+                operators.pop()  # Remove '('
+            elif token.value in "+-*/":  # Only allow +, -, *, /
+                if previous_token is None or previous_token.type == TokenType.SYMBOL and previous_token.value != ")":
+                    return None  # Two consecutive operators or operator at start
+                while (operators and operators[-1].value != "(" and
+                       precedence(operators[-1].value) >= precedence(token.value)):  # Apply operators with higher or equal precedence before adding the current operator. Use of precedence with help from: https://shorturl.at/P4f8X
+                    apply_operator()
+                operators.append(token)  # Add the current operator to the stack
+            else:
+                return None  # Reject any operator other than +, -, *, /
+
+        previous_token = token
+
+    # Check if the last token is an operator, which was an edge case
+    if tokens and tokens[-1].type == TokenType.SYMBOL and tokens[-1].value not in ")":
+        return None  # Incomplete expression (ends with an operator)
+
+    while operators:
+        if operators[-1].value in "()":  # Unbalanced parentheses
+            return None  
+        apply_operator()
+
+    if values:
+        if len(values) > 1:  # If there is more than one element in values at the end, expression is incomplete
+            return None
+        return values[0]
+    else:
+        return None
+
+
+def generate_expression_tree(text: str) -> TreeNode | None:
+
+    tokens = tokenize(text)
+    return build_tree(tokens)
+
+def evaluate_expression_tree(tree: TreeNode) -> float: #Recursively evaluates an expression tree
+    if tree is None:
+        return None
+
+    if tree._item.type == TokenType.NUMBER:
+        return tree._item.value
+
+    left_operand = evaluate_expression_tree(tree._left)
+    right_operand = evaluate_expression_tree(tree._right)
+
+    if left_operand is None or right_operand is None:
+        return None  # If either operand is None, return None
+    
+    if tree._item:
+        match tree._item.value:
+            case '*':
+                return left_operand * right_operand
+            case '/':
+                if right_operand == 0:
+                    return None
+                return left_operand / right_operand
+            case '-':
+                return left_operand - right_operand
+            case '+':
+                return left_operand + right_operand
+    else:
+        return None
+
+def simplify(tree: TreeNode) -> TreeNode:
+    if tree is None:
+        return None
+
+    tree._left = simplify(tree._left)   #Recursively simplify left and right subtrees
+    tree._right = simplify(tree._right)
+
+    if tree._item.type != TokenType.SYMBOL or not (tree._left and tree._right): # Only simplify if the node is an operator and has both left and right children
+        return tree
+
+    op = tree._item.value
+    left = tree._left._item
+    right = tree._right._item
+
+    if op == "+":
+        if left.type == TokenType.NUMBER and left.value == 0:
+            return tree._right #0 + E
+        if right.type == TokenType.NUMBER and right.value == 0: #E + 0
+            return tree._left
+
+    elif op == "-":
+        if right.type == TokenType.NUMBER and right.value == 0: #E - 0
+            return tree._left
+
+    elif op == "*":
+        if left.type == TokenType.NUMBER and left.value == 0 or right.type == TokenType.NUMBER and right.value == 0:
+            return TreeNode(Token(TokenType.NUMBER, 0)) #E * 0 or 0 * E
+        if left.type == TokenType.NUMBER and left.value == 1: #1 * E
+            return tree._right
+        if right.type == TokenType.NUMBER and right.value == 1: #E * 1
+            return tree._left
+
+    elif op == "/":
+        if right.type == TokenType.NUMBER and right.value == 1:
+            return tree._left #E / 1
+    return tree
+
+def differentiate(tree: TreeNode) -> TreeNode:
+    if tree is None:
+        return None
+    
+    if tree._item.type == TokenType.NUMBER:
+        return TreeNode(Token(TokenType.NUMBER, 0)) #The derivative of a constant is 0
+    if tree._item.type == TokenType.IDENTIFIER and tree._item.value == "x":
+        return TreeNode(Token(TokenType.NUMBER, 1)) #The derivative of the variable x is 1
+    if tree._item.type == TokenType.IDENTIFIER and tree._item.value != "x": #If we encounter a variable that is not x, derivative of variable with respect to x is 0.
+                return TreeNode(Token(TokenType.NUMBER, 0))
+    
+    operator = tree._item.value #Root node should be operator
+    left, right = tree._left, tree._right #Store the children
+
+    left_derivative = differentiate(left) #Recursively define the derivatives of the children
+    right_derivative = differentiate(right)
+
+    if operator == "+":
+        return TreeNode(Token(TokenType.SYMBOL, "+"), left_derivative, right_derivative) #Derivative of additions is the addition of derivatives
+    
+    if operator == "-":
+        return TreeNode(Token(TokenType.SYMBOL, "-"), left_derivative, right_derivative) #Derivative of subtractions is the subtraction of derivatives
+        
+    if operator == "*":
+        left_term = TreeNode(Token(TokenType.SYMBOL, "*"), left_derivative, right) #Define u'v
+        right_term = TreeNode(Token(TokenType.SYMBOL, "*"), left, right_derivative) #Define uv'
+        return TreeNode(Token(TokenType.SYMBOL, "+"), left_term, right_term) #Product rule states derivative is sum of u'v and uv'
+
+    if operator == "/":
+        numerator = TreeNode(Token(TokenType.SYMBOL, "-"), #Subtract u'v - uv'
+                            TreeNode(Token(TokenType.SYMBOL, "*"), left_derivative, right), #Define u'v
+                            TreeNode(Token(TokenType.SYMBOL, "*"), left, right_derivative)) #Define uv'
+        denominator = TreeNode(Token(TokenType.SYMBOL, "*"), right, right) #Define v^2
+        return TreeNode(Token(TokenType.SYMBOL, "/"), numerator, denominator) #Finally, derivative would be numerator / denominator
+    
+    return tree
+
+def is_numerical_expression_tree(tree: TreeNode) -> bool:
+    if tree is None:
+        return False
+    if tree._item.type == TokenType.IDENTIFIER:
+
+        return False
+    if tree._item.type == TokenType.NUMBER:
+        return True
+    return is_numerical_expression_tree(tree._left) and is_numerical_expression_tree(tree._right)
+
+
+def infix_expression_tree(tree: TreeNode) -> str:
+    if tree is None:
+        return "!"
+    if tree._item.type == TokenType.SYMBOL:
+        return f"({infix_expression_tree(tree._left)} {tree._item.value} {infix_expression_tree(tree._right)})"
+    return str(tree._item.value)
+
+
+def main(): #The input code is mostly the same as Prof. de Weerd's, however it is adapted slightly to meet Themis' requirements.
+    expression = input("give an expression: ")
+    while expression == "" or expression[0] != "!":
+        tokentree = generate_expression_tree(expression)
+        if tokentree is None:
+            print("this is not an infix expression")
+        else:
+            print("expression:", end=" ")
+            print(infix_expression_tree(tokentree))
+            if is_numerical_expression_tree(tokentree):
+                if evaluate_expression_tree(tokentree) is not None:
+                    print("the value of this expression is:", end=" ")
+                    print(evaluate_expression_tree(tokentree))
+                else:
+                    print("this is not a numerical infix expression")
+                    print("simplified:", infix_expression_tree(simplify(tokentree)))
+                    print("derivative to x:", infix_expression_tree(simplify(differentiate(tokentree))))
+            else:
+                print("this is not a numerical infix expression")
+                print("simplified:", infix_expression_tree(simplify(tokentree)))
+                print("derivative to x:", infix_expression_tree(simplify(differentiate(tokentree))))
+        expression = input("\ngive an expression: ")
+    print("good bye")
+
+main()
+"""
 lab5trainsinthestorm
 """
 
@@ -1268,8 +1767,17 @@ def main():
 
 main()
 
+# Time Complexity Analysis:
+# - V: Number of vertices (cities in the graph).
+# - E: Number of edges (connections between cities).
+# - Initialization (distances, predecessors): O(V)
+# - Enqueue operation (heap insertion): O(V log V)
+# - Remove_min (linear search + downheap): O(V^2), as it's called once per vertex and costs O(V) per call.
+# - Edge relaxation (updating distances and enqueueing neighbors): O(E log V)
+# Overall: O(V^2 + E log V) due to inefficient remove_min.
 """
 Tutorial Code / Additional Code
+
 """
 
 #2.3: Stack from one or more queues
@@ -1623,7 +2131,7 @@ Reconstructing paths takes O(V²) in worst case
 Total time complexity: O(E² + V²)
 """
 
-# Time Complexity Summary:
+# Tutorial / Additional Code: Time Complexity Summary:
 
 # StackUsingQueue:
 # push: O(1) - Simple enqueue operation.
