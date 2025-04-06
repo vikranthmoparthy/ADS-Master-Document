@@ -882,6 +882,268 @@ def main():
 
 if __name__ == "__main__": #For testing of Trie()
     main()
+"""
+lab4expressiontrees
+"""
+"""
+File:   expTree_test.py
+Author: Vikranth Moparthy (v.moparthy@student.rug.nl)
+Description:
+   A program that recognises and returns the value of a numerical infix expression. If the expression is non-numeric,
+it provides the simplified version of the expression and its derivative with respect to x.
+"""
+
+class Token:
+    def __init__(self, token_type: TokenType, value):
+        self.type = token_type
+        self.value = value
+
+def is_operator(char: str) -> bool:
+    return char in "+-*/"
+
+def precedence(op: str) -> int: #For building tree
+    if op in ('+', '-'):
+        return 1
+    if op in ('*', '/'): #Multiplication and division have higher priority
+        return 2
+    return 0
+
+def tokenize(text: str) -> list[Token]:
+    if text is None:
+        return None
+    tokens = []
+    pos = 0
+    while pos < len(text):
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+        if pos >= len(text):
+            break
+        if text[pos].isdigit():
+            value, pos = _match_number(text, pos)
+            tokens.append(Token(TokenType.NUMBER, value))
+        elif text[pos].isalpha():
+            identifier, pos = _match_identifier(text, pos)
+            tokens.append(Token(TokenType.IDENTIFIER, identifier))
+        else:
+            symbol, pos = _match_symbol(text, pos)
+            tokens.append(Token(TokenType.SYMBOL, symbol))
+    return tokens
+
+def build_tree(tokens: list[Token]) -> TreeNode: #Builds tree from tokens in infix order
+    values = []  # Stack for operands (list representation)
+    operators = []  # Stack for operators
+
+    def apply_operator(): #Pops operands and operator, builds subtree, pushes result. With help from: https://shorturl.at/P4f8X
+        if len(values) < 2 or not operators:
+            return
+        right = values.pop()
+        left = values.pop()
+        op = operators.pop()
+        node = TreeNode(Token(TokenType.SYMBOL, op.value))
+        node._left = left
+        node._right = right
+        values.append(node)
+
+    if not tokens or tokens[0].type == TokenType.SYMBOL and tokens[0].value not in "(":  # Reject if the expression starts with an operator
+        return None
+
+    previous_token = None
+
+    for token in tokens:
+        if token.type == TokenType.NUMBER or token.type == TokenType.IDENTIFIER:
+            if previous_token and previous_token.type in [TokenType.NUMBER, TokenType.IDENTIFIER]:  # Two consecutive operands are not allowed
+                return None  
+            values.append(TreeNode(token))
+
+        elif token.type == TokenType.SYMBOL:
+            if token.value == "(":  # If the token is an opening parenthesis
+                operators.append(token)
+            elif token.value == ")":  # If the token is a closing parenthesis
+                while operators and operators[-1].value != "(":  
+                    apply_operator()
+                if not operators:
+                    return None  # Unbalanced parentheses
+                operators.pop()  # Remove '('
+            elif token.value in "+-*/":  # Only allow +, -, *, /
+                if previous_token is None or previous_token.type == TokenType.SYMBOL and previous_token.value != ")":
+                    return None  # Two consecutive operators or operator at start
+                while (operators and operators[-1].value != "(" and
+                       precedence(operators[-1].value) >= precedence(token.value)):  # Apply operators with higher or equal precedence before adding the current operator. Use of precedence with help from: https://shorturl.at/P4f8X
+                    apply_operator()
+                operators.append(token)  # Add the current operator to the stack
+            else:
+                return None  # Reject any operator other than +, -, *, /
+
+        previous_token = token
+
+    # Check if the last token is an operator, which was an edge case
+    if tokens and tokens[-1].type == TokenType.SYMBOL and tokens[-1].value not in ")":
+        return None  # Incomplete expression (ends with an operator)
+
+    while operators:
+        if operators[-1].value in "()":  # Unbalanced parentheses
+            return None  
+        apply_operator()
+
+    if values:
+        if len(values) > 1:  # If there is more than one element in values at the end, expression is incomplete
+            return None
+        return values[0]
+    else:
+        return None
+
+
+def generate_expression_tree(text: str) -> TreeNode | None:
+
+    tokens = tokenize(text)
+    return build_tree(tokens)
+
+def evaluate_expression_tree(tree: TreeNode) -> float: #Recursively evaluates an expression tree
+    if tree is None:
+        return None
+
+    if tree._item.type == TokenType.NUMBER:
+        return tree._item.value
+
+    left_operand = evaluate_expression_tree(tree._left)
+    right_operand = evaluate_expression_tree(tree._right)
+
+    if left_operand is None or right_operand is None:
+        return None  # If either operand is None, return None
+    
+    if tree._item:
+        match tree._item.value:
+            case '*':
+                return left_operand * right_operand
+            case '/':
+                if right_operand == 0:
+                    return None
+                return left_operand / right_operand
+            case '-':
+                return left_operand - right_operand
+            case '+':
+                return left_operand + right_operand
+    else:
+        return None
+
+def simplify(tree: TreeNode) -> TreeNode:
+    if tree is None:
+        return None
+
+    tree._left = simplify(tree._left)   #Recursively simplify left and right subtrees
+    tree._right = simplify(tree._right)
+
+    if tree._item.type != TokenType.SYMBOL or not (tree._left and tree._right): # Only simplify if the node is an operator and has both left and right children
+        return tree
+
+    op = tree._item.value
+    left = tree._left._item
+    right = tree._right._item
+
+    if op == "+":
+        if left.type == TokenType.NUMBER and left.value == 0:
+            return tree._right #0 + E
+        if right.type == TokenType.NUMBER and right.value == 0: #E + 0
+            return tree._left
+
+    elif op == "-":
+        if right.type == TokenType.NUMBER and right.value == 0: #E - 0
+            return tree._left
+
+    elif op == "*":
+        if left.type == TokenType.NUMBER and left.value == 0 or right.type == TokenType.NUMBER and right.value == 0:
+            return TreeNode(Token(TokenType.NUMBER, 0)) #E * 0 or 0 * E
+        if left.type == TokenType.NUMBER and left.value == 1: #1 * E
+            return tree._right
+        if right.type == TokenType.NUMBER and right.value == 1: #E * 1
+            return tree._left
+
+    elif op == "/":
+        if right.type == TokenType.NUMBER and right.value == 1:
+            return tree._left #E / 1
+    return tree
+
+def differentiate(tree: TreeNode) -> TreeNode:
+    if tree is None:
+        return None
+    
+    if tree._item.type == TokenType.NUMBER:
+        return TreeNode(Token(TokenType.NUMBER, 0)) #The derivative of a constant is 0
+    if tree._item.type == TokenType.IDENTIFIER and tree._item.value == "x":
+        return TreeNode(Token(TokenType.NUMBER, 1)) #The derivative of the variable x is 1
+    if tree._item.type == TokenType.IDENTIFIER and tree._item.value != "x": #If we encounter a variable that is not x, derivative of variable with respect to x is 0.
+                return TreeNode(Token(TokenType.NUMBER, 0))
+    
+    operator = tree._item.value #Root node should be operator
+    left, right = tree._left, tree._right #Store the children
+
+    left_derivative = differentiate(left) #Recursively define the derivatives of the children
+    right_derivative = differentiate(right)
+
+    if operator == "+":
+        return TreeNode(Token(TokenType.SYMBOL, "+"), left_derivative, right_derivative) #Derivative of additions is the addition of derivatives
+    
+    if operator == "-":
+        return TreeNode(Token(TokenType.SYMBOL, "-"), left_derivative, right_derivative) #Derivative of subtractions is the subtraction of derivatives
+        
+    if operator == "*":
+        left_term = TreeNode(Token(TokenType.SYMBOL, "*"), left_derivative, right) #Define u'v
+        right_term = TreeNode(Token(TokenType.SYMBOL, "*"), left, right_derivative) #Define uv'
+        return TreeNode(Token(TokenType.SYMBOL, "+"), left_term, right_term) #Product rule states derivative is sum of u'v and uv'
+
+    if operator == "/":
+        numerator = TreeNode(Token(TokenType.SYMBOL, "-"), #Subtract u'v - uv'
+                            TreeNode(Token(TokenType.SYMBOL, "*"), left_derivative, right), #Define u'v
+                            TreeNode(Token(TokenType.SYMBOL, "*"), left, right_derivative)) #Define uv'
+        denominator = TreeNode(Token(TokenType.SYMBOL, "*"), right, right) #Define v^2
+        return TreeNode(Token(TokenType.SYMBOL, "/"), numerator, denominator) #Finally, derivative would be numerator / denominator
+    
+    return tree
+
+def is_numerical_expression_tree(tree: TreeNode) -> bool:
+    if tree is None:
+        return False
+    if tree._item.type == TokenType.IDENTIFIER:
+
+        return False
+    if tree._item.type == TokenType.NUMBER:
+        return True
+    return is_numerical_expression_tree(tree._left) and is_numerical_expression_tree(tree._right)
+
+
+def infix_expression_tree(tree: TreeNode) -> str:
+    if tree is None:
+        return "!"
+    if tree._item.type == TokenType.SYMBOL:
+        return f"({infix_expression_tree(tree._left)} {tree._item.value} {infix_expression_tree(tree._right)})"
+    return str(tree._item.value)
+
+
+def main(): #The input code is mostly the same as Prof. de Weerd's, however it is adapted slightly to meet Themis' requirements.
+    expression = input("give an expression: ")
+    while expression == "" or expression[0] != "!":
+        tokentree = generate_expression_tree(expression)
+        if tokentree is None:
+            print("this is not an infix expression")
+        else:
+            print("expression:", end=" ")
+            print(infix_expression_tree(tokentree))
+            if is_numerical_expression_tree(tokentree):
+                if evaluate_expression_tree(tokentree) is not None:
+                    print("the value of this expression is:", end=" ")
+                    print(evaluate_expression_tree(tokentree))
+                else:
+                    print("this is not a numerical infix expression")
+                    print("simplified:", infix_expression_tree(simplify(tokentree)))
+                    print("derivative to x:", infix_expression_tree(simplify(differentiate(tokentree))))
+            else:
+                print("this is not a numerical infix expression")
+                print("simplified:", infix_expression_tree(simplify(tokentree)))
+                print("derivative to x:", infix_expression_tree(simplify(differentiate(tokentree))))
+        expression = input("\ngive an expression: ")
+    print("good bye")
+
+main()
 
 """
 lab5trainsinthestorm
